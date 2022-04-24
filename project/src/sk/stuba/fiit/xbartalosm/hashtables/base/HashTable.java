@@ -1,4 +1,4 @@
-package sk.stuba.fiit.xbartalosm.base;
+package sk.stuba.fiit.xbartalosm.hashtables.base;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

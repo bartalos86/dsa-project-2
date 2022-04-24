@@ -1,4 +1,4 @@
-package sk.stuba.fiit.xbartalosm.base;
+package sk.stuba.fiit.xbartalosm.hashtables.base;
 
 public class TableItem<T extends Comparable<T>>  {
 

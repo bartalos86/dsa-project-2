@@ -1,6 +1,4 @@
-package sk.stuba.fiit.xbartalosm;
-
-import java.util.HashSet;
+package sk.stuba.fiit.xbartalosm.deprecated;
 
 public class BDDTree {
 

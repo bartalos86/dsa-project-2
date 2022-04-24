@@ -1,4 +1,4 @@
-package sk.stuba.fiit.xbartalosm;
+package sk.stuba.fiit.xbartalosm.deprecated;
 
 import java.util.HashSet;
 
