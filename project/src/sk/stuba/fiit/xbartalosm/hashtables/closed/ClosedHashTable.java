@@ -2,6 +2,8 @@ package sk.stuba.fiit.xbartalosm.hashtables.closed;
 
 import sk.stuba.fiit.xbartalosm.hashtables.base.HashTable;
 
+import java.util.ArrayList;
+
 public class ClosedHashTable<T extends Comparable<T>> extends HashTable<T, ClosedTableItem<T>> {
 
 
@@ -172,5 +174,26 @@ public class ClosedHashTable<T extends Comparable<T>> extends HashTable<T, Close
             }
 
         }
+    }
+    @Override
+    public ArrayList<T> getAllItems(){
+        ArrayList<T> items = new ArrayList<>();
+
+        for(int i = 0; i < array.length; i++){
+            if(array[i] != null){
+                items.add(array[i].getData());
+                ClosedTableItem<T> current = array[i];
+
+                while(current.hasNext()){
+                    items.add(current.getNext().getData());
+                  current =  current.getNext();
+                }
+
+
+            }
+        }
+
+        return items;
+
     }
 }

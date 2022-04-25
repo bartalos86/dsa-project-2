@@ -255,7 +255,6 @@ public class DecisionDiagram {
         if(parentNode == null)
             return null;
 
-
         //Reduction I
         if(parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0){
 
@@ -272,9 +271,7 @@ public class DecisionDiagram {
                 }
 
             }else{
-
                     return parentNode.getRightChild(); //This will be the root
-
             }
 
 

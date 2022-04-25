@@ -2,6 +2,8 @@ package sk.stuba.fiit.xbartalosm.layered;
 
 import sk.stuba.fiit.xbartalosm.hashtables.base.HashTable;
 import sk.stuba.fiit.xbartalosm.hashtables.base.TableItem;
+import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
+import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedTableItem;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -112,12 +114,15 @@ public class DecisionNode implements Comparable<DecisionNode> {
     private String simplifyExpression(String expression) {
 
         if (expression.contains("+")) {
-            HashTable<String, TableItem<String>> partsMap = new HashTable<>(TableItem.class);
+            ClosedHashTable<String> partsMap = new ClosedHashTable<>();
 
             String[] parts = expression.split("\\+");
 
             for (int i = 0; i < parts.length; i++) {
+                if(partsMap.search(parts[i]) == null) //Only one
                 partsMap.insert(parts[i]);
+                else
+                    System.out.println(parts[i]);
             }
 
             ArrayList<String> allParts = partsMap.getAllItems();
@@ -134,7 +139,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
         }
 
-        HashSet<Character> characters = new HashSet<>();
+       /* HashSet<Character> characters = new HashSet<>();
         boolean containsAddition = false;
         for (int i = 0; i < expression.length(); i++) {
             if (Character.isAlphabetic(expression.charAt(i))) {
@@ -148,7 +153,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
         if (characters.size() == 1 && containsAddition) {
             return expression.charAt(0) + ""; //C+C+C = C
-        }
+        }*/
 
         return expression;
 
