@@ -103,7 +103,7 @@ public class HashTable<T extends Comparable<T>, U extends TableItem<T>> {
     }
 
     public int size(){
-        return tableSize;
+        return tableSize - freeSpace;
     }
 
 

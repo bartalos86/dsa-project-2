@@ -8,9 +8,13 @@ public class DecisionDiagram {
 
     private DecisionNode root;
     private int totalNodes = 1;
+    private int expectedSize = 0;
+    private double reductionRate = 0;
 
     public DecisionDiagram(DecisionNode root) {
         this.root = root;
+        this.totalNodes = countNodes(root);
+
     }
 
     public static DecisionDiagram createBDD(String expression, String order){
@@ -47,7 +51,7 @@ public class DecisionDiagram {
                 for(int node = 0; node < nodes.size(); node++) {
 
                     DecisionNode parentNode = nodes.get(node);
-
+                    //TODO: maybe to expression loop
                     if(parentNode instanceof FinalNode)
                         continue;
 
@@ -62,6 +66,8 @@ public class DecisionDiagram {
                         continue;*/
 
                     for (int j = 0; j < expressionParts.length; j++) {
+
+
 
                         String part = expressionParts[j];
 
@@ -166,12 +172,7 @@ public class DecisionDiagram {
                     }
 
 
-
-
-                    //isLastLayer = parentNode.getExpression().length() == 1;
-
-
-
+                   // isLastLayer = isLastLayer|| parentNode.getExpression().length() == 1;
 
                     //Add the nodes to next level
                     DecisionNode setuppedRightNode;
@@ -241,10 +242,11 @@ public class DecisionDiagram {
 
                    rootNode = reductionI(parentNode,rightNode);
 
+
                 }
             }
             DecisionDiagram diagram =new DecisionDiagram(rootNode);
-            diagram.setTotalNodes(totalNodes);
+        diagram.setExpectedSize((int)Math.pow(2,order.length()+1)-1);
         return diagram;
 
     }
@@ -262,12 +264,12 @@ public class DecisionDiagram {
                 System.out.println("Reducing:" + parentNode.getExpression());
 
 
-                DecisionNode.Side pSide =  parentNode.getSide();
+                DecisionNode.Side pSide =  parentNode.sideRelativeToParent();
 
                 if(pSide == DecisionNode.Side.LEFT){
-                    parentNode.getParent().setLeftChild(node);
+                    parentNode.getParent().setLeftChild(parentNode.getLeftChild());
                 }else{
-                    parentNode.getParent().setRightChild(node);
+                    parentNode.getParent().setRightChild(parentNode.getLeftChild());
                 }
 
             }else{
@@ -279,7 +281,7 @@ public class DecisionDiagram {
         }
 
         if(parentNode.getParent() == null){
-            return  parentNode;
+            return parentNode;
         }
 
 
@@ -313,6 +315,24 @@ public class DecisionDiagram {
 
     }
 
+    private int countNodes(DecisionNode root){
+        ClosedHashTable<Integer> ids = new ClosedHashTable<>();
+        countRecursiveInOrder(root,ids);
+
+        return ids.size();
+    }
+
+    private void countRecursiveInOrder(DecisionNode currentNode, ClosedHashTable<Integer> ids){
+        if(currentNode != null){
+            if(ids.search(currentNode.getId()) == null){
+                ids.insert(currentNode.getId());
+            }
+            countRecursiveInOrder(currentNode.getLeftChild(),ids);
+
+            countRecursiveInOrder(currentNode.getRightChild(),ids);
+        }
+    }
+
 
     private void traverseInOrderRecursive(DecisionNode currentNode) {
 
@@ -337,7 +357,9 @@ public class DecisionDiagram {
         System.out.println("#########Tree###########");
 
         traverseInOrderRecursive(root);
+        System.out.println("Expected size: " + expectedSize);
         System.out.println("Total nodes: " + totalNodes);
+        System.out.println("Reduction rate: " + reductionRate);
 
         System.out.println("###########end tree#############");
 
@@ -392,6 +414,20 @@ public class DecisionDiagram {
     }
 
     public void setTotalNodes(int totalNodes) {
-        this.totalNodes = totalNodes +1;
+        this.totalNodes = totalNodes;
+    }
+
+    public int getExpectedSize() {
+        return expectedSize;
+    }
+
+    public void setExpectedSize(int expectedSize) {
+        this.expectedSize = expectedSize;
+        this.reductionRate =  (1 - totalNodes / (double)expectedSize)*100;
+
+    }
+
+    public double getReductionRate() {
+        return reductionRate;
     }
 }

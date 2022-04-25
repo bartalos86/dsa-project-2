@@ -69,6 +69,17 @@ public class DecisionNode implements Comparable<DecisionNode> {
         return side;
     }
 
+    public Side sideRelativeToParent(){
+        if(this.parent != null){
+            if(parent.getRightChild() == this)
+                return Side.RIGHT;
+            else if(parent.getLeftChild() == this)
+                return Side.LEFT;
+        }
+
+        return null;
+    }
+
     public void setSide(Side side) {
         this.side = side;
     }
@@ -162,6 +173,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
     @Override
     public int compareTo(DecisionNode o) {
+        this.expression = simplifyExpression(expression);
         return this.expression.compareTo(o.getExpression());
     }
 }
