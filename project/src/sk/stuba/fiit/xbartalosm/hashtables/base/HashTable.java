@@ -1,7 +1,6 @@
 package sk.stuba.fiit.xbartalosm.hashtables.base;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class HashTable<T extends Comparable<T>, U extends TableItem<T>> {
 
@@ -89,17 +88,21 @@ public class HashTable<T extends Comparable<T>, U extends TableItem<T>> {
         }
     }
 
-    public ArrayList<T> getAllItems(){
-        ArrayList<T> items = new ArrayList<>();
-
+    public T[] getAllItems(){
+        T[] items =  (T[]) Array.newInstance(type,tableSize-freeSpace);
+        int arrCounter = 0;
         for(int i = 0; i < array.length; i++){
             if(array[i] != null){
-                items.add(array[i].getData());
+                items[arrCounter++] = (array[i].getData());
             }
         }
 
         return items;
 
+    }
+
+    protected Class getType() {
+        return type;
     }
 
     public int size(){

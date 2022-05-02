@@ -1,12 +1,6 @@
 package sk.stuba.fiit.xbartalosm.layered;
 
-import sk.stuba.fiit.xbartalosm.hashtables.base.HashTable;
-import sk.stuba.fiit.xbartalosm.hashtables.base.TableItem;
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
-import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedTableItem;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class DecisionNode implements Comparable<DecisionNode> {
 
@@ -136,14 +130,14 @@ public class DecisionNode implements Comparable<DecisionNode> {
                     System.out.println(parts[i]);
             }
 
-            ArrayList<String> allParts = partsMap.getAllItems();
+            String[] allParts = partsMap.getAllItems(String.class);
 
             StringBuilder expressionBuilder = new StringBuilder();
-            for (int i = 0; i < allParts.size(); i++) {
+            for (int i = 0; i < allParts.length; i++) {
                 if (expressionBuilder.isEmpty())
-                    expressionBuilder.append(allParts.get(i));
+                    expressionBuilder.append(allParts[i]);
                 else
-                    expressionBuilder.append("+").append(allParts.get(i));
+                    expressionBuilder.append("+").append(allParts[i]);
             }
             expression = expressionBuilder.toString();
 

@@ -2,7 +2,6 @@ package sk.stuba.fiit.xbartalosm.layered;
 
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 
-import java.util.ArrayList;
 
 public class DecisionDiagram {
 
@@ -45,12 +44,12 @@ public class DecisionDiagram {
 
                 char currentChar = order.charAt(i);
 
-                ArrayList<DecisionNode> nodes = levels[i].getAllItems();
+                DecisionNode[] nodes = levels[i].getAllItems(DecisionNode.class);
                 boolean isLastLayer = order.length() == i+1;
 
-                for(int node = 0; node < nodes.size(); node++) {
+                for(int node = 0; node < nodes.length; node++) {
 
-                    DecisionNode parentNode = nodes.get(node);
+                    DecisionNode parentNode = nodes[node];
                     //TODO: maybe to expression loop
                     if(parentNode instanceof FinalNode)
                         continue;
@@ -246,7 +245,7 @@ public class DecisionDiagram {
                 }
             }
             DecisionDiagram diagram =new DecisionDiagram(rootNode);
-        diagram.setExpectedSize((int)Math.pow(2,order.length()+1)-1);
+        diagram.setExpectedSize((int)Math.pow(2,order.length())-1);
         return diagram;
 
     }
@@ -296,7 +295,7 @@ public class DecisionDiagram {
             char current = result.charAt(i);
 
             if(currentNode.getLevel() != i)
-                continue;
+                continue;   
 
             if(current == '1'){
                 currentNode = currentNode.getRightChild();

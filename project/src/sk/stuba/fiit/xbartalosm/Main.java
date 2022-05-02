@@ -14,7 +14,7 @@ public class Main {
         //binaryExpression = "ABC+abc";
         binaryExpression = "AB+C";
         //binaryExpression = "AB+BC+AD";
-        binaryExpression = "D";
+        binaryExpression = "AB+BC+AD";
         System.out.println(binaryExpression.hashCode());
 
         BDDTree tree = new BDDTree();
@@ -23,7 +23,7 @@ public class Main {
         diagram.printTree();
         diagram.printTreeNorm();
 
-        System.out.println(DecisionDiagram.BDDuse(diagram,"1111"));
+        System.out.println(DecisionDiagram.BDDuse(diagram,"1001"));
 
         //System.out.println("abc".hashCode() + " "  + "ABC".hashCode());
 
