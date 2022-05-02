@@ -126,7 +126,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
             for (int i = 0; i < parts.length; i++) {
                 if(partsMap.search(parts[i]) == null) //Only one
                 partsMap.insert(parts[i]);
-                else
+                else if(parts[i].contains("0"))
                     System.out.println(parts[i]);
             }
 
@@ -167,6 +167,8 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
     @Override
     public int compareTo(DecisionNode o) {
+
+
         this.expression = simplifyExpression(expression);
         return this.expression.compareTo(o.getExpression());
     }

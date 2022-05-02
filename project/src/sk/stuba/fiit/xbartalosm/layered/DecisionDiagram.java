@@ -16,12 +16,11 @@ public class DecisionDiagram {
 
     }
 
-    public static DecisionDiagram createBDD(String expression, String order){
+    public static DecisionDiagram createBDD(String expression, String order) {
 
 
-        ClosedHashTable<DecisionNode>[] levels = new ClosedHashTable[order.length()+1];
+        ClosedHashTable<DecisionNode>[] levels = new ClosedHashTable[order.length() + 1];
         DecisionNode rootNode;
-        int totalNodes = 0;
 
         //Root node
         levels[0] = new ClosedHashTable<>();
@@ -31,282 +30,288 @@ public class DecisionDiagram {
 
         //Last level
         levels[order.length()] = new ClosedHashTable<>();
-        FinalNode zeroFinal = new FinalNode(order.length(),0);
-        FinalNode oneFinal = new FinalNode(order.length(),1);
+        FinalNode zeroFinal = new FinalNode(order.length(), 0);
+        FinalNode oneFinal = new FinalNode(order.length(), 1);
         levels[order.length()].insert(zeroFinal);
         levels[order.length()].insert(oneFinal);
 
 
-            for (int i = 0; i < order.length(); i++) {
+        for (int i = 0; i < order.length(); i++) {
 
-                if (levels[i+1] == null)
-                    levels[i+1] = new ClosedHashTable<DecisionNode>();
+            if (levels[i + 1] == null)
+                levels[i + 1] = new ClosedHashTable<>();
 
-                char currentChar = order.charAt(i);
+            char currentChar = order.charAt(i);
 
-                DecisionNode[] nodes = levels[i].getAllItems(DecisionNode.class);
-                boolean isLastLayer = order.length() == i+1;
+            DecisionNode[] nodes = levels[i].getAllItems(DecisionNode.class);
+            boolean isLastLayer = order.length() == i + 1;
 
-                for(int node = 0; node < nodes.length; node++) {
+            for (int node = 0; node < nodes.length; node++) {
 
-                    DecisionNode parentNode = nodes[node];
-                    //TODO: maybe to expression loop
-                    if(parentNode instanceof FinalNode)
+                DecisionNode parentNode = nodes[node];
+                //TODO: maybe to expression loop
+                if (parentNode instanceof FinalNode)
+                    continue;
+
+                String[] expressionParts = parentNode.getExpression().split("\\+");
+
+                DecisionNode leftNode = new DecisionNode(i + 1);
+                DecisionNode rightNode = new DecisionNode(i + 1);
+
+                // boolean breakHappened = false;
+
+
+                for (int j = 0; j < expressionParts.length; j++) {
+
+
+                    String part = expressionParts[j];
+
+                    // System.out.println(part);
+
+
+                    //Contradiction == 0
+                    if (part.contains(Character.toString(Character.toLowerCase(currentChar))) && part.contains(Character.toString(currentChar))) {
+
+                        if (parentNode.getExpression().contains("+"))
+                            continue;
+                        else {
+                            rightNode = zeroFinal;
+                            leftNode = zeroFinal;
+                            break;
+                        }
+
+                    }
+
+                    boolean isSingleCharResult = (part.length() == 1 && (part.equals(Character.toString(currentChar)) ||
+                            part.equals(Character.toString(Character.toLowerCase(currentChar)))));//&& parentNode.getExpression().contains("+");
+
+                    boolean isAbsoluteAnd = !parentNode.getExpression().contains("+") && parentNode.getExpression().length() > 1;
+                    //Maybe add diferent charcter recognition
+                    boolean everyPartContainsCharBig = true;
+                    boolean everyPartContainsCharSmall = true;
+
+                    for (int ex = 0; ex < expressionParts.length; ex++) {
+                        if (!expressionParts[ex].contains(Character.toString(currentChar)))
+                            everyPartContainsCharBig = false;
+
+                        if (!expressionParts[ex].contains(Character.toString(Character.toLowerCase(currentChar))))
+                            everyPartContainsCharSmall = false;
+                    }
+
+                    isAbsoluteAnd = isAbsoluteAnd || ((everyPartContainsCharBig ^ everyPartContainsCharSmall) && parentNode.getExpression().contains("+"));
+
+
+                    // System.out.println("Current expression: " + parentNode.getExpression());
+                    //  if(isAbsoluteAnd)
+                    // System.out.println("ABS: " + parentNode.getExpression());
+
+                    //Positive
+                    if (part.contains(Character.toString(currentChar))) {
+
+                        if (isSingleCharResult) {
+                            rightNode = oneFinal;
+
+                            //Final node
+                            if (parentNode.getExpression().length() == 1) {
+                                leftNode = zeroFinal;
+                                isLastLayer = true;
+                            }
+
+                        }
+
+                        if (isAbsoluteAnd) {
+                            leftNode = zeroFinal;
+                        }
+
+                        String cleanSubExp = part.replaceAll(Character.toString(currentChar), "");
+
+                        if (!(rightNode instanceof FinalNode))
+                            rightNode.addToExpression(cleanSubExp);
+
+
                         continue;
+                    }
 
-                    String[] expressionParts = parentNode.getExpression().split("\\+");
+                    //Negative
+                    if (part.contains(Character.toString(Character.toLowerCase(currentChar)))) {
 
-                    DecisionNode leftNode = new DecisionNode(i + 1);
-                    DecisionNode rightNode = new DecisionNode(i + 1);
+                        if (isSingleCharResult) {
+                            leftNode = oneFinal;
 
-                    boolean breakHappened = false;
-
-                    /*if(parentNode.getExpression().length() <= 0)
-                        continue;*/
-
-                    for (int j = 0; j < expressionParts.length; j++) {
-
-
-
-                        String part = expressionParts[j];
-
-                        System.out.println(part);
-
-
-                        //Contradiction == 0
-                        if (part.contains(Character.toString(Character.toLowerCase(currentChar))) && part.contains(Character.toString(currentChar))) {
-
-                            if(parentNode.getExpression().contains("+"))
-                                continue;
-                            else{
+                            //Final node
+                            if (parentNode.getExpression().length() == 1) {
                                 rightNode = zeroFinal;
-                                leftNode = zeroFinal;
-                                break;
+                                isLastLayer = true;
                             }
-
                         }
 
-                        boolean isSingleCharResult = (part.length() == 1 && (part.equals(Character.toString(currentChar)) ||
-                                part.equals(Character.toString(Character.toLowerCase(currentChar)))));//&& parentNode.getExpression().contains("+");
-
-                        boolean isAbsoluteAnd = !parentNode.getExpression().contains("+") && parentNode.getExpression().length()>1;
-                        //Maybe add diferent charcter recognition
-                        boolean everyPartContainsCharBig = true;
-                        boolean everyPartContainsCharSmall = true;
-
-                        for (int ex = 0; ex < expressionParts.length; ex++){
-                            if(!expressionParts[ex].contains(Character.toString(currentChar)))
-                                everyPartContainsCharBig = false;
-
-                            if(!expressionParts[ex].contains(Character.toString(Character.toLowerCase(currentChar))))
-                                everyPartContainsCharSmall = false;
+                        if (isAbsoluteAnd) {
+                            rightNode = zeroFinal;
                         }
 
-                        isAbsoluteAnd = isAbsoluteAnd || ((everyPartContainsCharBig ^ everyPartContainsCharSmall) && parentNode.getExpression().contains("+"));
+                        String cleanSubExp = part.replaceAll(Character.toString(Character.toLowerCase(currentChar)), "");
 
+                        if (!(leftNode instanceof FinalNode))
+                            leftNode.addToExpression(cleanSubExp);
 
-                        System.out.println("Current expression: " + parentNode.getExpression());
-                        if(isAbsoluteAnd)
-                            System.out.println("ABS: " + parentNode.getExpression());
-
-                        //Positive
-                        if (part.contains(Character.toString(currentChar))) {
-
-                            if(isSingleCharResult){
-                                rightNode = oneFinal;
-
-                                //Final node
-                                if(parentNode.getExpression().length() == 1){
-                                    leftNode = zeroFinal;
-                                    isLastLayer = true;
-                                }
-
-                            }
-
-                            if(isAbsoluteAnd){
-                                leftNode = zeroFinal;
-                            }
-
-                            String cleanSubExp = part.replaceAll(Character.toString(currentChar), "");
-
-                            if(!(rightNode instanceof FinalNode))
-                                    rightNode.addToExpression(cleanSubExp);
-
-
-                            continue;
-                        }
-
-                        //Negative
-                        if (part.contains(Character.toString(Character.toLowerCase(currentChar)))) {
-
-                            if(isSingleCharResult){
-                                leftNode = oneFinal;
-
-                                //Final node
-                                if(parentNode.getExpression().length() == 1){
-                                    rightNode = zeroFinal;
-                                    isLastLayer = true;
-                                }
-                            }
-
-                            if(isAbsoluteAnd) {
-                                rightNode = zeroFinal;
-                            }
-
-                            String cleanSubExp = part.replaceAll(Character.toString(Character.toLowerCase(currentChar)), "");
-
-                            if(!(leftNode instanceof FinalNode))
-                                leftNode.addToExpression(cleanSubExp);
-
-                            continue;
-                        }
-
-
-                        if(!(rightNode instanceof FinalNode))
-                            rightNode.addToExpression(part);
-
-                        if(!(leftNode instanceof FinalNode))
-                            leftNode.addToExpression(part);
-
+                        continue;
                     }
 
 
-                   // isLastLayer = isLastLayer|| parentNode.getExpression().length() == 1;
+                    if (!(rightNode instanceof FinalNode))
+                        rightNode.addToExpression(part);
 
-                    //Add the nodes to next level
-                    DecisionNode setuppedRightNode;
-                    if( levels[i+1].search(rightNode) == null){
-
-                        if(!rightNode.getExpression().isEmpty()){
-                            //ZERO AND ONE doesnt need to be inserted;
-                            if(!(rightNode instanceof FinalNode)){
-                                levels[i+1].insert(rightNode);
-                                System.out.println("Inserting: " + rightNode.getExpression());
-
-                            }
-                                totalNodes++;
-                                parentNode.setRightChild(rightNode);
-
-                        }
-
-
-                    }else{
-                       DecisionNode existingNode =  levels[i+1].search(rightNode);
-
-                            parentNode.setRightChild(existingNode);
-                    }
-
-                    //Left side
-                    DecisionNode setuppedLeftNode;
-                    if(levels[i+1].search(leftNode) == null){
-
-                        if(!leftNode.getExpression().isEmpty()){
-
-                            if(!(leftNode instanceof FinalNode)){
-                                levels[i+1].insert(leftNode);
-                                System.out.println("Inserting: " + leftNode.getExpression());
-                            }
-                            totalNodes++;
-                            parentNode.setLeftChild(leftNode);
-                        }
-
-                    }else{
-
-                        DecisionNode existingNode =  levels[i+1].search(leftNode);
-                        if(!leftNode.getExpression().isEmpty())
-                        parentNode.setLeftChild(existingNode);
-                    }
-
-
-                    boolean areNodesSetup = leftNode instanceof FinalNode || rightNode instanceof FinalNode;
-
-
-                    if(isLastLayer){
-
-                       // if(Character.isLowerCase(parentNode.getExpression().charAt(0))){
-                        if(parentNode.getSide() == DecisionNode.Side.LEFT){
-                            if(parentNode.getLeftChild() == null)
-                            parentNode.setLeftChild(oneFinal);
-
-                            if(parentNode.getRightChild() == null)
-                                parentNode.setRightChild(zeroFinal);
-                        }else{
-                            if(parentNode.getLeftChild() == null)
-                                parentNode.setLeftChild(zeroFinal);
-                            if(parentNode.getRightChild() == null)
-                             parentNode.setRightChild(oneFinal);
-                        }
-
-                    }
-
-                   rootNode = reductionI(parentNode,rightNode);
-
+                    if (!(leftNode instanceof FinalNode))
+                        leftNode.addToExpression(part);
 
                 }
+
+
+                // isLastLayer = isLastLayer|| parentNode.getExpression().length() == 1;
+
+                //Add the nodes to next level
+                DecisionNode setuppedRightNode;
+                DecisionNode rightNodeExists = levels[i + 1].search(rightNode);
+                if (rightNodeExists == null) {
+
+                    if (!rightNode.getExpression().isEmpty()) {
+                        //ZERO AND ONE doesnt need to be inserted;
+                        if (!(rightNode instanceof FinalNode)) {
+                            levels[i + 1].insert(rightNode);
+                        }
+                        parentNode.setRightChild(rightNode);
+
+                    }
+
+
+                } else {
+                    DecisionNode existingNode = rightNodeExists;
+                    parentNode.setRightChild(existingNode);
+                }
+
+                //Left side
+                DecisionNode setuppedLeftNode;
+                DecisionNode leftNodeExists = levels[i + 1].search(leftNode);
+                if (leftNodeExists == null) {
+
+                    if (!leftNode.getExpression().isEmpty()) {
+
+                        if (!(leftNode instanceof FinalNode)) {
+                            levels[i + 1].insert(leftNode);
+                            // System.out.println("Inserting: " + leftNode.getExpression());
+                        }
+
+                        parentNode.setLeftChild(leftNode);
+                    }
+
+                } else {
+
+                    DecisionNode existingNode = leftNodeExists;//levels[i+1].search(leftNode);
+
+                    if (existingNode == null)
+                        System.out.printf("Null");
+
+                    if (!leftNode.getExpression().isEmpty())
+                        parentNode.setLeftChild(existingNode);
+                }
+
+
+                // boolean areNodesSetup = leftNode instanceof FinalNode || rightNode instanceof FinalNode;
+
+                // isLastLayer = true; //For testing, maybe even required
+                // isLastLayer = isLastLayer || parentNode.getLeftChild() == null || parentNode.getRightChild() == null;
+
+                if (parentNode.getLeftChild() == null || parentNode.getRightChild() == null)
+                    System.out.println();
+
+                if (isLastLayer) {
+
+                    //if(Character.isLowerCase(parentNode.getExpression().charAt(0))){
+                    if (parentNode.sideRelativeToParent() == DecisionNode.Side.LEFT) {
+                        if (parentNode.getLeftChild() == null)
+                            parentNode.setLeftChild(oneFinal);
+
+                        if (parentNode.getRightChild() == null)
+                            parentNode.setRightChild(zeroFinal);
+                    } else {
+                        if (parentNode.getLeftChild() == null)
+                            parentNode.setLeftChild(zeroFinal);
+                        if (parentNode.getRightChild() == null)
+                            parentNode.setRightChild(oneFinal);
+                    }
+
+                }
+
+                rootNode = reductionI(parentNode);
+
+
             }
-            DecisionDiagram diagram =new DecisionDiagram(rootNode);
-        diagram.setExpectedSize((int)Math.pow(2,order.length())-1);
+        }
+        DecisionDiagram diagram = new DecisionDiagram(rootNode);
+        diagram.setExpectedSize((int) Math.pow(2, order.length()) - 1);
         return diagram;
 
     }
 
     //TODO: maybe dont do reduction when children are FinalNodes
-    private static DecisionNode reductionI(DecisionNode parentNode, DecisionNode node){
+    private static DecisionNode reductionI(DecisionNode parentNode) {
 
-        if(parentNode == null)
+        if (parentNode == null)
             return null;
 
+        if (parentNode.getLeftChild() == null)
+            System.out.printf("null");
+
         //Reduction I
-        if(parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0){
+        if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0) {
 
-            if(parentNode.getParent() != null){
-                System.out.println("Reducing:" + parentNode.getExpression());
+            if (parentNode.getParent() != null) {
+                // System.out.println("Reducing:" + parentNode.getExpression());
 
 
-                DecisionNode.Side pSide =  parentNode.sideRelativeToParent();
+                DecisionNode.Side pSide = parentNode.sideRelativeToParent();
 
-                if(pSide == DecisionNode.Side.LEFT){
+                if (pSide == DecisionNode.Side.LEFT) {
                     parentNode.getParent().setLeftChild(parentNode.getLeftChild());
-                }else{
+                } else {
                     parentNode.getParent().setRightChild(parentNode.getLeftChild());
                 }
 
-            }else{
-                    return parentNode.getRightChild(); //This will be the root
+            } else {
+                return parentNode.getRightChild(); //This will be the root
             }
-
 
 
         }
 
-        if(parentNode.getParent() == null){
+        if (parentNode.getParent() == null) {
             return parentNode;
         }
 
 
-        return reductionI(parentNode.getParent(),node);
+        return reductionI(parentNode.getParent());
     }
 
-    public static int BDDuse(DecisionDiagram diagram, String result){
+    public static int BDDuse(DecisionDiagram diagram, String result) {
 
         DecisionNode currentNode = diagram.getRoot();
 
         for (int i = 0; i < result.length(); i++) {
             char current = result.charAt(i);
 
-            if(currentNode.getLevel() != i)
-                continue;   
+            if (currentNode.getLevel() != i)
+                continue;
 
-            if(current == '1'){
+            if (current == '1') {
                 currentNode = currentNode.getRightChild();
-            }else if(current == '0'){
+            } else if (current == '0') {
                 currentNode = currentNode.getLeftChild();
             }
 
         }
 
-        if(currentNode instanceof FinalNode){
-            return  ((FinalNode)currentNode).getValue();
+        if (currentNode instanceof FinalNode) {
+            return ((FinalNode) currentNode).getValue();
         }
 
         return -1;
@@ -314,21 +319,21 @@ public class DecisionDiagram {
 
     }
 
-    private int countNodes(DecisionNode root){
+    private int countNodes(DecisionNode root) {
         ClosedHashTable<Integer> ids = new ClosedHashTable<>();
-        countRecursiveInOrder(root,ids);
+        countRecursiveInOrder(root, ids);
 
         return ids.size();
     }
 
-    private void countRecursiveInOrder(DecisionNode currentNode, ClosedHashTable<Integer> ids){
-        if(currentNode != null){
-            if(ids.search(currentNode.getId()) == null){
+    private void countRecursiveInOrder(DecisionNode currentNode, ClosedHashTable<Integer> ids) {
+        if (currentNode != null) {
+            if (ids.search(currentNode.getId()) == null) {
                 ids.insert(currentNode.getId());
             }
-            countRecursiveInOrder(currentNode.getLeftChild(),ids);
+            countRecursiveInOrder(currentNode.getLeftChild(), ids);
 
-            countRecursiveInOrder(currentNode.getRightChild(),ids);
+            countRecursiveInOrder(currentNode.getRightChild(), ids);
         }
     }
 
@@ -339,7 +344,7 @@ public class DecisionDiagram {
             traverseInOrderRecursive(currentNode.getLeftChild());
             System.out.print(currentNode.getExpression() + " - Level: " + currentNode.getLevel() + " ID: " + currentNode.getId());
 
-            if(currentNode instanceof FinalNode)
+            if (currentNode instanceof FinalNode)
                 System.out.print(" Value: " + ((FinalNode) currentNode).getValue() + "\n");
             else
                 System.out.println();
@@ -349,47 +354,47 @@ public class DecisionDiagram {
 
     }
 
-    public void printTreeNorm(){
-      //  calculateSize();
-       // getFinalVector();
-       // System.out.println("Size: " + size);
+    public void printTreeNorm() {
+        //  calculateSize();
+        // getFinalVector();
+        // System.out.println("Size: " + size);
         System.out.println("#########Tree###########");
 
         traverseInOrderRecursive(root);
-        System.out.println("Expected size: " + expectedSize);
-        System.out.println("Total nodes: " + totalNodes);
-        System.out.println("Reduction rate: " + reductionRate);
+        printStatistics();
 
         System.out.println("###########end tree#############");
 
     }
 
+    public void printStatistics() {
+        System.out.println("Expected size: " + expectedSize);
+        System.out.println("Total nodes: " + totalNodes);
+        System.out.println("Reduction rate: " + reductionRate);
+    }
 
-    void inorderTraversalHelper(DecisionNode node)
-    {
-        if(node!=null)
-        {
+
+    void inorderTraversalHelper(DecisionNode node) {
+        if (node != null) {
             inorderTraversalHelper(node.getLeftChild());
             System.out.printf("%s ", node.getExpression());
             inorderTraversalHelper(node.getRightChild());
         }
     }
+
     //function to print inorder traversal
-    public void inorderTraversal()
-    {
+    public void inorderTraversal() {
         inorderTraversalHelper(this.root);
     }
+
     // helper function to print the tree.
-    void printTreeHelper(DecisionNode root, int space)
-    {
+    void printTreeHelper(DecisionNode root, int space) {
         int i;
-        if(root != null)
-        {
+        if (root != null) {
             space = space + 10;
             printTreeHelper(root.getRightChild(), space);
             System.out.printf("\n");
-            for ( i = 10; i < space; i++)
-            {
+            for (i = 10; i < space; i++) {
                 System.out.printf(" ");
             }
             System.out.printf("%s", root.getExpression());
@@ -397,9 +402,9 @@ public class DecisionDiagram {
             printTreeHelper(root.getLeftChild(), space);
         }
     }
+
     // function to print the tree.
-    public void printTree()
-    {
+    public void printTree() {
         printTreeHelper(this.root, 0);
     }
 
@@ -422,7 +427,7 @@ public class DecisionDiagram {
 
     public void setExpectedSize(int expectedSize) {
         this.expectedSize = expectedSize;
-        this.reductionRate =  (1 - totalNodes / (double)expectedSize)*100;
+        this.reductionRate = (1 - totalNodes / (double) expectedSize) * 100;
 
     }
 

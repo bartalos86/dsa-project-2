@@ -21,7 +21,7 @@ public class ClosedHashTable<T extends Comparable<T>> extends HashTable<T, Close
             if(array[i] != null){
 
                 ClosedTableItem<T> tableItem = array[i];
-                int hashCode  = tableItem.hashCode()  % newSize;
+                int hashCode  = Math.abs(tableItem.hashCode())  % newSize;
 
                 //Insert the single item
                 if(!tableItem.hasNext()){
@@ -39,7 +39,7 @@ public class ClosedHashTable<T extends Comparable<T>> extends HashTable<T, Close
                 }else{
                     //rehash the full list
                     while(tableItem != null){
-                        hashCode  = tableItem.hashCode() % newSize;
+                        hashCode  = Math.abs(tableItem.hashCode())  % newSize;
                         ClosedTableItem<T> next = tableItem.getNext();
 
                         if(temp[hashCode] != null){
