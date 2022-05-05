@@ -240,9 +240,13 @@ public class DecisionDiagram {
                             parentNode.setRightChild(oneFinal);
                     }
 
+
                 }
 
+
+
                 rootNode = reductionI(parentNode);
+
 
 
             }
@@ -262,20 +266,28 @@ public class DecisionDiagram {
         if (parentNode.getLeftChild() == null)
             System.out.printf("null");
 
+        DecisionNode grandparent = parentNode.getParent();
+
         //Reduction I
-        if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0) {
+        if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0 || parentNode.getLeftChild() == parentNode.getRightChild()) {
 
-            if (parentNode.getParent() != null) {
-                // System.out.println("Reducing:" + parentNode.getExpression());
+            if (grandparent != null) {
 
+
+                System.out.println("level - " + parentNode.getLevel() + " - " + parentNode.getExpression());
 
                 DecisionNode.Side pSide = parentNode.sideRelativeToParent();
 
-                if (pSide == DecisionNode.Side.LEFT) {
-                    parentNode.getParent().setLeftChild(parentNode.getLeftChild());
-                } else {
-                    parentNode.getParent().setRightChild(parentNode.getLeftChild());
+                if(pSide == DecisionNode.Side.BOTH)
+                    System.out.println("both");
+
+                if (pSide == DecisionNode.Side.LEFT || pSide == DecisionNode.Side.BOTH) {
+                    grandparent.setLeftChild(parentNode.getLeftChild());
+                } else if(pSide == DecisionNode.Side.RIGHT){
+                    grandparent.setRightChild(parentNode.getLeftChild());
                 }
+
+
 
             } else {
                 return parentNode.getRightChild(); //This will be the root
@@ -288,8 +300,8 @@ public class DecisionDiagram {
             return parentNode;
         }
 
-
-        return reductionI(parentNode.getParent());
+       // return parentNode.getParent() ;
+        return reductionI(grandparent);
     }
 
     public static int BDDuse(DecisionDiagram diagram, String result) {
@@ -327,13 +339,16 @@ public class DecisionDiagram {
     }
 
     private void countRecursiveInOrder(DecisionNode currentNode, ClosedHashTable<Integer> ids) {
-        if (currentNode != null) {
+
+        if (currentNode != null && !(currentNode instanceof FinalNode)) {
             if (ids.search(currentNode.getId()) == null) {
                 ids.insert(currentNode.getId());
             }
+
             countRecursiveInOrder(currentNode.getLeftChild(), ids);
 
             countRecursiveInOrder(currentNode.getRightChild(), ids);
+
         }
     }
 

@@ -5,7 +5,7 @@ import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 public class DecisionNode implements Comparable<DecisionNode> {
 
     public enum Side {
-        LEFT, RIGHT
+        LEFT, RIGHT, BOTH
     }
 
     private static int ID = 0;
@@ -65,6 +65,10 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
     public Side sideRelativeToParent(){
         if(this.parent != null){
+
+            if(parent.getRightChild() == this && parent.getLeftChild() == this)
+                return Side.BOTH;
+
             if(parent.getRightChild() == this)
                 return Side.RIGHT;
             else if(parent.getLeftChild() == this)
@@ -139,7 +143,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
                 else
                     expressionBuilder.append("+").append(allParts[i]);
             }
-            expression = expressionBuilder.toString();
+            expression = expressionBuilder.toString().replace(" ", "");
 
 
         }
@@ -170,6 +174,21 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
 
         this.expression = simplifyExpression(expression);
+        //return this.hashCode() == o.hashCode() ? 0: 1;
+      //  System.out.println("Comparison: " + this.expression +" - " + o.getExpression() + " " + this.expression.compareTo(o.getExpression()));
+
         return this.expression.compareTo(o.getExpression());
+       // o.setExpression(o.simplifyExpression(o.getExpression()));
+       /* if(o.getRightChild() != null && this.getRightChild() != null){
+           result += o.getRightChild().compareTo(this.getRightChild());
+        }
+
+        if(o.getLeftChild() != null && this.getLeftChild() != null){
+            result += o.getLeftChild().compareTo(this.getLeftChild());
+        }*/
+
+        //getRightChild().compareTo(o.getRightChild()) + getLeftChild().compareTo(o.getLeftChild())
+
+        //return this.id == o.getId() ? 0: 1;
     }
 }

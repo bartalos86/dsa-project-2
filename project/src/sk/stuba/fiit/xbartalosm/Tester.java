@@ -82,4 +82,18 @@ public class Tester {
 
     }
 
+    public String generateRandomInput(int length){
+        StringBuilder testingBuilder = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            if(random.nextBoolean()){
+                testingBuilder.append("1");
+            }else{
+                testingBuilder.append("1");
+            }
+        }
+
+        return testingBuilder.toString();
+    }
+
 }
