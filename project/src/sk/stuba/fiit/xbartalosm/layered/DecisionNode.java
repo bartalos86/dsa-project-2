@@ -2,6 +2,8 @@ package sk.stuba.fiit.xbartalosm.layered;
 
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 
+import java.util.ArrayList;
+
 public class DecisionNode implements Comparable<DecisionNode> {
 
     public enum Side {
@@ -10,6 +12,8 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
     private static int ID = 0;
     private int id;
+
+    ArrayList<DecisionNode> parents = new ArrayList<>();
 
     private String expression = "";
     private int level;
@@ -31,6 +35,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
     public void setLeftChild(DecisionNode leftChild) {
         if (leftChild != null) {
             leftChild.setParent(this);
+            leftChild.addParent(this);
             leftChild.setSide(Side.LEFT);
         }
 
@@ -44,6 +49,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
     public void setRightChild(DecisionNode rightChild) {
         if (rightChild != null) {
             rightChild.setParent(this);
+            rightChild.addParent(this);
             rightChild.setSide(Side.RIGHT);
         }
 
@@ -63,7 +69,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
         return side;
     }
 
-    public Side sideRelativeToParent(){
+    public Side sideRelativeToParent(DecisionNode parent){
         if(this.parent != null){
 
             if(parent.getRightChild() == this && parent.getLeftChild() == this)
@@ -168,6 +174,13 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
     }
 
+    public void addParent(DecisionNode node){
+        parents.add(node);
+    }
+
+    public ArrayList<DecisionNode> getParents() {
+        return parents;
+    }
 
     @Override
     public int compareTo(DecisionNode o) {

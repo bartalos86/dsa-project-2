@@ -2,6 +2,8 @@ package sk.stuba.fiit.xbartalosm.layered;
 
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 
+import java.util.ArrayList;
+
 
 public class DecisionDiagram {
 
@@ -227,7 +229,9 @@ public class DecisionDiagram {
                 if (isLastLayer) {
 
                     //if(Character.isLowerCase(parentNode.getExpression().charAt(0))){
-                    if (parentNode.sideRelativeToParent() == DecisionNode.Side.LEFT) {
+
+                    //We can use side because its the lastly added element
+                    if (parentNode.getSide() == DecisionNode.Side.LEFT) {
                         if (parentNode.getLeftChild() == null)
                             parentNode.setLeftChild(oneFinal);
 
@@ -244,9 +248,7 @@ public class DecisionDiagram {
                 }
 
 
-
                 rootNode = reductionI(parentNode);
-
 
 
             }
@@ -263,45 +265,46 @@ public class DecisionDiagram {
         if (parentNode == null)
             return null;
 
-        if (parentNode.getLeftChild() == null)
-            System.out.printf("null");
+            if (parentNode.getLeftChild() == null)
+                System.out.printf("null");
 
-        DecisionNode grandparent = parentNode.getParent();
+            DecisionNode grandparent = parentNode.getParent();
 
-        //Reduction I
-        if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0 || parentNode.getLeftChild() == parentNode.getRightChild()) {
-
-            if (grandparent != null) {
+            //Reduction I
+            if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0 || parentNode.getLeftChild() == parentNode.getRightChild()) {
 
 
-                System.out.println("level - " + parentNode.getLevel() + " - " + parentNode.getExpression());
+                if (grandparent != null) {
 
-                DecisionNode.Side pSide = parentNode.sideRelativeToParent();
+                    System.out.println("level - " + parentNode.getLevel() + " - " + parentNode.getExpression());
 
-                if(pSide == DecisionNode.Side.BOTH)
-                    System.out.println("both");
 
-                if (pSide == DecisionNode.Side.LEFT || pSide == DecisionNode.Side.BOTH) {
-                    grandparent.setLeftChild(parentNode.getLeftChild());
-                } else if(pSide == DecisionNode.Side.RIGHT){
-                    grandparent.setRightChild(parentNode.getLeftChild());
+                    DecisionNode.Side pSide = parentNode.sideRelativeToParent(grandparent);
+
+                    if (pSide == DecisionNode.Side.BOTH)
+                        System.out.println("both");
+
+                    if (pSide == DecisionNode.Side.LEFT || pSide == DecisionNode.Side.BOTH) {
+                        grandparent.setLeftChild(parentNode.getLeftChild());
+                    } else if (pSide == DecisionNode.Side.RIGHT) {
+                        grandparent.setRightChild(parentNode.getLeftChild());
+                    }
+
+
+                } else {
+                    return parentNode.getRightChild(); //This will be the root
                 }
 
 
-
-            } else {
-                return parentNode.getRightChild(); //This will be the root
             }
 
+            if (grandparent == null) {
+                return parentNode;
+            }
 
-        }
+        // return parentNode.getParent() ;
+            return reductionI(grandparent);
 
-        if (parentNode.getParent() == null) {
-            return parentNode;
-        }
-
-       // return parentNode.getParent() ;
-        return reductionI(grandparent);
     }
 
     public static int BDDuse(DecisionDiagram diagram, String result) {
