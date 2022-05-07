@@ -40,9 +40,8 @@ public class Tester {
 
     public ClosedHashTable<TesterInput> generateTestingVector(String expression, String order){
         ClosedHashTable<TesterInput> testingVector = new ClosedHashTable<>();//int[(int)Math.pow(2,order.length())];
-        int vecCounter = 0;
-
-        for(int i = 0; i < Math.pow(2,order.length()); i++){
+        int results = (int) Math.pow(2,order.length());
+        for(int i = 0; i <results; i++){
             StringBuilder inputBuilder = new StringBuilder();
             inputBuilder.append(Integer.toBinaryString(i)).insert(0,"0".repeat(order.length()-inputBuilder.length()));
             String tempExpression = expression;

@@ -2,8 +2,6 @@ package sk.stuba.fiit.xbartalosm.layered;
 
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 
-import java.util.ArrayList;
-
 
 public class DecisionDiagram {
 
@@ -19,7 +17,6 @@ public class DecisionDiagram {
     }
 
     public static DecisionDiagram createBDD(String expression, String order) {
-
 
         ClosedHashTable<DecisionNode>[] levels = new ClosedHashTable[order.length() + 1];
         DecisionNode rootNode;
@@ -61,16 +58,8 @@ public class DecisionDiagram {
                 DecisionNode leftNode = new DecisionNode(i + 1);
                 DecisionNode rightNode = new DecisionNode(i + 1);
 
-                // boolean breakHappened = false;
-
-
                 for (int j = 0; j < expressionParts.length; j++) {
-
-
                     String part = expressionParts[j];
-
-                    // System.out.println(part);
-
 
                     //Contradiction == 0
                     if (part.contains(Character.toString(Character.toLowerCase(currentChar))) && part.contains(Character.toString(currentChar))) {
@@ -86,9 +75,10 @@ public class DecisionDiagram {
                     }
 
                     boolean isSingleCharResult = (part.length() == 1 && (part.equals(Character.toString(currentChar)) ||
-                            part.equals(Character.toString(Character.toLowerCase(currentChar)))));//&& parentNode.getExpression().contains("+");
-
+                            part.equals(Character.toString(Character.toLowerCase(currentChar)))));
                     boolean isAbsoluteAnd = !parentNode.getExpression().contains("+") && parentNode.getExpression().length() > 1;
+
+
                     //Maybe add diferent charcter recognition
                     boolean everyPartContainsCharBig = true;
                     boolean everyPartContainsCharSmall = true;
@@ -103,35 +93,23 @@ public class DecisionDiagram {
 
                     isAbsoluteAnd = isAbsoluteAnd || ((everyPartContainsCharBig ^ everyPartContainsCharSmall) && parentNode.getExpression().contains("+"));
 
-
-                    // System.out.println("Current expression: " + parentNode.getExpression());
-                    //  if(isAbsoluteAnd)
-                    // System.out.println("ABS: " + parentNode.getExpression());
-
                     //Positive
                     if (part.contains(Character.toString(currentChar))) {
-
                         if (isSingleCharResult) {
                             rightNode = oneFinal;
-
                             //Final node
                             if (parentNode.getExpression().length() == 1) {
                                 leftNode = zeroFinal;
                                 isLastLayer = true;
                             }
-
                         }
 
                         if (isAbsoluteAnd) {
                             leftNode = zeroFinal;
                         }
-
                         String cleanSubExp = part.replaceAll(Character.toString(currentChar), "");
-
                         if (!(rightNode instanceof FinalNode))
                             rightNode.addToExpression(cleanSubExp);
-
-
                         continue;
                     }
 
@@ -169,11 +147,7 @@ public class DecisionDiagram {
 
                 }
 
-
-                // isLastLayer = isLastLayer|| parentNode.getExpression().length() == 1;
-
                 //Add the nodes to next level
-                DecisionNode setuppedRightNode;
                 DecisionNode rightNodeExists = levels[i + 1].search(rightNode);
                 if (rightNodeExists == null) {
 
@@ -193,7 +167,6 @@ public class DecisionDiagram {
                 }
 
                 //Left side
-                DecisionNode setuppedLeftNode;
                 DecisionNode leftNodeExists = levels[i + 1].search(leftNode);
                 if (leftNodeExists == null) {
 
@@ -201,7 +174,6 @@ public class DecisionDiagram {
 
                         if (!(leftNode instanceof FinalNode)) {
                             levels[i + 1].insert(leftNode);
-                            // System.out.println("Inserting: " + leftNode.getExpression());
                         }
 
                         parentNode.setLeftChild(leftNode);
@@ -218,18 +190,10 @@ public class DecisionDiagram {
                         parentNode.setLeftChild(existingNode);
                 }
 
-
-                // boolean areNodesSetup = leftNode instanceof FinalNode || rightNode instanceof FinalNode;
-
-                // isLastLayer = true; //For testing, maybe even required
-                // isLastLayer = isLastLayer || parentNode.getLeftChild() == null || parentNode.getRightChild() == null;
-
                 if (parentNode.getLeftChild() == null || parentNode.getRightChild() == null)
                     System.out.println();
 
                 if (isLastLayer) {
-
-                    //if(Character.isLowerCase(parentNode.getExpression().charAt(0))){
 
                     //We can use side because its the lastly added element
                     if (parentNode.getSide() == DecisionNode.Side.LEFT) {
@@ -249,19 +213,19 @@ public class DecisionDiagram {
                 }
 
 
-                rootNode = reductionI(parentNode);
+                rootNode = reductionS(parentNode);
 
 
             }
         }
         DecisionDiagram diagram = new DecisionDiagram(rootNode);
+       // rootNode = reductionS(rootNode);
         diagram.setExpectedSize((int) Math.pow(2, order.length()) - 1);
         return diagram;
 
     }
 
-    //TODO: maybe dont do reduction when children are FinalNodes
-    private static DecisionNode reductionI(DecisionNode parentNode) {
+    private static DecisionNode reductionS(DecisionNode parentNode) {
 
         if (parentNode == null)
             return null;
@@ -269,19 +233,14 @@ public class DecisionDiagram {
             DecisionNode[] parents = parentNode.getParents().getAllItems(DecisionNode.class);
 
             if(parents != null)
-        for (DecisionNode parent :
-                parents) {
-
+        for (DecisionNode parent : parents) {
             DecisionNode grandparent = parent;
 
-            //Reduction I
-            if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0 || parentNode.getLeftChild() == parentNode.getRightChild()) {
-
+            //Reduction S
+            if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0) {
 
                 if (grandparent != null) {
-
                     DecisionNode.Side pSide = parentNode.sideRelativeToParent(grandparent);
-
                     if (pSide == DecisionNode.Side.BOTH)
                         System.out.println("both");
 
@@ -292,42 +251,35 @@ public class DecisionDiagram {
                     }
 
                     parentNode.getLeftChild().removeParent(parentNode);
-
-
-                } else {
+                } else { //Probably never going to happen
                     return parentNode.getRightChild(); //This will be the root
                 }
 
-
             }
-
             if (grandparent == null) {
                 return parentNode;
             }
 
         }
 
-        DecisionNode[]  parents2 = parentNode.getParents().getAllItems(DecisionNode.class);
+            if(parents == null && parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0){
+                return parentNode.getRightChild();
+            }
 
-        if (parents2 == null) {
+        DecisionNode[]  updatedParent = parents;// parentNode.getParents().getAllItems(DecisionNode.class);
+
+        if (updatedParent == null) {
             return parentNode;
         }
 
-        for (DecisionNode parent :
-                parents2) {
-
-
-
-            return reductionI(parent);
-
+        for (DecisionNode parent : updatedParent) {
+            return reductionS(parent);
         }
 
         return null;
-
     }
 
     public static int BDDuse(DecisionDiagram diagram, String result) {
-
         DecisionNode currentNode = diagram.getRoot();
 
         for (int i = 0; i < result.length(); i++) {
@@ -341,7 +293,6 @@ public class DecisionDiagram {
             } else if (current == '0') {
                 currentNode = currentNode.getLeftChild();
             }
-
         }
 
         if (currentNode instanceof FinalNode) {
@@ -349,8 +300,6 @@ public class DecisionDiagram {
         }
 
         return -1;
-
-
     }
 
     private int countNodes(DecisionNode root) {
@@ -392,9 +341,6 @@ public class DecisionDiagram {
     }
 
     public void printTreeNorm() {
-        //  calculateSize();
-        // getFinalVector();
-        // System.out.println("Size: " + size);
         System.out.println("#########Tree###########");
 
         traverseInOrderRecursive(root);
@@ -411,21 +357,21 @@ public class DecisionDiagram {
     }
 
 
-    void inorderTraversalHelper(DecisionNode node) {
+   /* void inorderTraversalHelper(DecisionNode node) {
         if (node != null) {
             inorderTraversalHelper(node.getLeftChild());
             System.out.printf("%s ", node.getExpression());
             inorderTraversalHelper(node.getRightChild());
         }
-    }
+    }*/
 
     //function to print inorder traversal
-    public void inorderTraversal() {
+   /* public void inorderTraversal() {
         inorderTraversalHelper(this.root);
-    }
+    }*/
 
     // helper function to print the tree.
-    void printTreeHelper(DecisionNode root, int space) {
+   /* void printTreeHelper(DecisionNode root, int space) {
         int i;
         if (root != null) {
             space = space + 10;
@@ -438,12 +384,12 @@ public class DecisionDiagram {
             System.out.printf("\n");
             printTreeHelper(root.getLeftChild(), space);
         }
-    }
+    }*/
 
     // function to print the tree.
-    public void printTree() {
+   /* public void printTree() {
         printTreeHelper(this.root, 0);
-    }
+    }*/
 
 
     public DecisionNode getRoot() {

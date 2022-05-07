@@ -1,6 +1,5 @@
 package sk.stuba.fiit.xbartalosm;
 
-import sk.stuba.fiit.xbartalosm.deprecated.BDDTree;
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 import sk.stuba.fiit.xbartalosm.layered.DecisionDiagram;
 
@@ -24,28 +23,6 @@ public class Main {
         binaryExpression="abcDe+Acd+abc+AbC+acDe+AC+acde+aBD+aE+be";
         String order = "ABCDE";
 
-
-        //System.out.println(binaryExpression.hashCode());
-
-        BDDTree tree = new BDDTree();
-        DecisionDiagram diagram = DecisionDiagram.createBDD(binaryExpression,order);
-
-        ClosedHashTable<TesterInput> testInput = new Tester().generateTestingVector(binaryExpression,order);
-        TesterInput[] inputs = testInput.getAllItems(TesterInput.class);
-        //010111001100
-
-        for (int i = 0; i < inputs.length; i++) {
-            int expected = DecisionDiagram.BDDuse(diagram,inputs[i].getKey());
-            if(inputs[i].getValue() != expected)
-                System.out.println(inputs[i].getKey() + " " + inputs[i].getValue() + " expected: " + expected +
-                        (inputs[i].getValue() == expected ? " correct" : " error"));
-
-
-        }
-
-        diagram.printTree();
-        diagram.printTreeNorm();
-
         System.out.println("---------Testing performance---------");
         for (int i = 1; i < 26; i++) {
             System.out.println("Case #" + i);
@@ -59,9 +36,13 @@ public class Main {
             testCorrectness(i);
         }
 
-        /*while(!testCorrectness(7)){
+       /* while(!testCorrectness(15)){
 
         }*/
+
+
+        System.out.println("-----------Testing sample-----------");
+        sampleCorrectnessTest("ABCD+BCD+D+B","ABCD");
 
         System.out.println();
     }
@@ -70,7 +51,7 @@ public class Main {
         final String abc =  "ABCDEFGHIJKLMONPQRSTUVWXYZ";
         String testingOrder = abc.substring(0,n);
         Random rand = new Random();
-        int parts = rand.nextInt(26)+4;
+        int parts = rand.nextInt(15)+4;
 
         System.out.printf("Testing for %d characters, %d parts and %d min. part length \n", n,parts,Math.min(2,n));
 
@@ -134,20 +115,28 @@ public class Main {
         System.out.println("BDDuse time: " + (endTime - startTime)/100000 + " ms");
 
         System.out.println("--------------------");
+    }
 
+    private static void sampleCorrectnessTest(String expression, String order){
 
-        //Correctness test
-      /*  ClosedHashTable<TesterInput> testInput = new Tester().generateTestingVector(testingExpression,testingOrder);
+        System.out.println("Expression: " + expression);
+        System.out.println("Character order: " + order);
+
+        DecisionDiagram testDiagram = DecisionDiagram.createBDD(expression,order);
+        //testDiagram.printStatistics();
+       // testDiagram.printTreeNorm();
+
+        ClosedHashTable<TesterInput> testInput = new Tester().generateTestingVector(expression,order);
         TesterInput[] inputs = testInput.getAllItems(TesterInput.class);
 
         for (int i = 0; i < inputs.length; i++) {
-            int expected = DecisionDiagram.BDDuse(testDiagram,inputs[i].getKey());
-            if(inputs[i].getValue() != expected)
-                System.out.println(inputs[i].getKey() + " " + inputs[i].getValue() + " expected: " + expected +
-                        (inputs[i].getValue() == expected ? " correct" : " error"));
+            int result = DecisionDiagram.BDDuse(testDiagram,inputs[i].getKey());
+                System.out.println(inputs[i].getKey() + ": expected " + inputs[i].getValue() + " result: " + result +
+                        (inputs[i].getValue() == result ? " - correct" : " - error"));
 
 
-        }*/
+
+        }
     }
 
 }
