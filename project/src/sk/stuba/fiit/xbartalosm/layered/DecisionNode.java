@@ -13,7 +13,7 @@ public class DecisionNode implements Comparable<DecisionNode> {
     private static int ID = 0;
     private int id;
 
-    ArrayList<DecisionNode> parents = new ArrayList<>();
+    ClosedHashTable<DecisionNode> parents = new ClosedHashTable<>();
 
     private String expression = "";
     private int level;
@@ -26,6 +26,8 @@ public class DecisionNode implements Comparable<DecisionNode> {
     public DecisionNode(int level) {
         this.level = level;
         this.id = ID++;
+
+
     }
 
     public DecisionNode getLeftChild() {
@@ -154,54 +156,25 @@ public class DecisionNode implements Comparable<DecisionNode> {
 
         }
 
-       /* HashSet<Character> characters = new HashSet<>();
-        boolean containsAddition = false;
-        for (int i = 0; i < expression.length(); i++) {
-            if (Character.isAlphabetic(expression.charAt(i))) {
-                characters.add(expression.charAt(i));
-
-            }
-
-            if (expression.charAt(i) == '+')
-                containsAddition = true;
-        }
-
-        if (characters.size() == 1 && containsAddition) {
-            return expression.charAt(0) + ""; //C+C+C = C
-        }*/
-
         return expression;
 
     }
 
     public void addParent(DecisionNode node){
-        parents.add(node);
+        parents.insert(node);
     }
 
-    public ArrayList<DecisionNode> getParents() {
+    public ClosedHashTable<DecisionNode> getParents() {
         return parents;
+    }
+
+    public void removeParent(DecisionNode parent){
+        parents.delete(parent);
     }
 
     @Override
     public int compareTo(DecisionNode o) {
-
-
         this.expression = simplifyExpression(expression);
-        //return this.hashCode() == o.hashCode() ? 0: 1;
-      //  System.out.println("Comparison: " + this.expression +" - " + o.getExpression() + " " + this.expression.compareTo(o.getExpression()));
-
         return this.expression.compareTo(o.getExpression());
-       // o.setExpression(o.simplifyExpression(o.getExpression()));
-       /* if(o.getRightChild() != null && this.getRightChild() != null){
-           result += o.getRightChild().compareTo(this.getRightChild());
-        }
-
-        if(o.getLeftChild() != null && this.getLeftChild() != null){
-            result += o.getLeftChild().compareTo(this.getLeftChild());
-        }*/
-
-        //getRightChild().compareTo(o.getRightChild()) + getLeftChild().compareTo(o.getLeftChild())
-
-        //return this.id == o.getId() ? 0: 1;
     }
 }

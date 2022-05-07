@@ -175,6 +175,9 @@ public class ClosedHashTable<T extends Comparable<T>> extends HashTable<T, Close
         }
     }
     public T[] getAllItems(Class dataType){
+        if(tableSize-freeSpace <= 0)
+            return null;
+
         T[] items =  (T[]) Array.newInstance(dataType,tableSize-freeSpace);
         int arrCounter = 0;
         for(int i = 0; i < array.length; i++){

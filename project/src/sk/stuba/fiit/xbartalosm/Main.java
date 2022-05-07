@@ -4,6 +4,8 @@ import sk.stuba.fiit.xbartalosm.deprecated.BDDTree;
 import sk.stuba.fiit.xbartalosm.hashtables.closed.ClosedHashTable;
 import sk.stuba.fiit.xbartalosm.layered.DecisionDiagram;
 
+import java.util.Random;
+
 public class Main {
 
 
@@ -11,16 +13,19 @@ public class Main {
         String binaryExpression = "ABC+AC+ac";
         binaryExpression = "ABD+ACd+ABCDd+ABC+abc+ABD";
         //binaryExpression = "ABCD+BCD+D+B";
-        //binaryExpression = "ABCdD";
-        //binaryExpression = "ABC+abc";
-        binaryExpression = "AB+C";
+        binaryExpression = "ABCdD";
+       // binaryExpression = "ABC+abc";
+        //binaryExpression = "AB+C";
         //binaryExpression = "aBcDeFGhIJkL+ABCDeFghIJkL+deFGhIJkL+BcDEFgh+AbCdefGHijkl+JkL";
-        binaryExpression = "fG+aBCdefG+ABCD";
-        //binaryExpression = "DE+bcDE+AbCDe";
+        //binaryExpression = "fG+aBCdefG+ABCD";
+       // binaryExpression = "DE+bcDE+AbCDe";
         //ABcDEfGH+abCDEfghIJKL+Jk+ABcdeFghIJk+BC+abcDEfghIJKL
-        binaryExpression = "AB+cA+bD";
-        String order = "CBDA";
-        System.out.println(binaryExpression.hashCode());
+        //binaryExpression = "AB+cA+bD";
+        binaryExpression="abcDe+Acd+abc+AbC+acDe+AC+acde+aBD+aE+be";
+        String order = "ABCDE";
+
+
+        //System.out.println(binaryExpression.hashCode());
 
         BDDTree tree = new BDDTree();
         DecisionDiagram diagram = DecisionDiagram.createBDD(binaryExpression,order);
@@ -41,20 +46,20 @@ public class Main {
         diagram.printTree();
         diagram.printTreeNorm();
 
-      /*  System.out.println("---------Testing performance---------");
+        System.out.println("---------Testing performance---------");
         for (int i = 1; i < 26; i++) {
             System.out.println("Case #" + i);
-           // testPerformance(i);
+           testPerformance(i);
         }
-        System.out.println("######################################");*/
+        System.out.println("######################################");
 
         System.out.println("---------Testing correctness---------");
-        for (int i = 1; i < 50; i++) {
-            //System.out.println("Case #" + i);
-            //testCorrectness(12);
+        for (int i = 1; i < 16; i++) {
+            System.out.println("Case #" + i);
+            testCorrectness(i);
         }
 
-        /*while(!testCorrectness(12)){
+        /*while(!testCorrectness(7)){
 
         }*/
 
@@ -64,7 +69,8 @@ public class Main {
     private static boolean testCorrectness(int n){
         final String abc =  "ABCDEFGHIJKLMONPQRSTUVWXYZ";
         String testingOrder = abc.substring(0,n);
-        int parts = Math.max(4,n/2);
+        Random rand = new Random();
+        int parts = rand.nextInt(26)+4;
 
         System.out.printf("Testing for %d characters, %d parts and %d min. part length \n", n,parts,Math.min(2,n));
 

@@ -48,6 +48,7 @@ public class DecisionDiagram {
             DecisionNode[] nodes = levels[i].getAllItems(DecisionNode.class);
             boolean isLastLayer = order.length() == i + 1;
 
+            if(nodes != null)
             for (int node = 0; node < nodes.length; node++) {
 
                 DecisionNode parentNode = nodes[node];
@@ -265,19 +266,19 @@ public class DecisionDiagram {
         if (parentNode == null)
             return null;
 
-            if (parentNode.getLeftChild() == null)
-                System.out.printf("null");
+            DecisionNode[] parents = parentNode.getParents().getAllItems(DecisionNode.class);
 
-            DecisionNode grandparent = parentNode.getParent();
+            if(parents != null)
+        for (DecisionNode parent :
+                parents) {
+
+            DecisionNode grandparent = parent;
 
             //Reduction I
             if (parentNode.getLeftChild().compareTo(parentNode.getRightChild()) == 0 || parentNode.getLeftChild() == parentNode.getRightChild()) {
 
 
                 if (grandparent != null) {
-
-                    System.out.println("level - " + parentNode.getLevel() + " - " + parentNode.getExpression());
-
 
                     DecisionNode.Side pSide = parentNode.sideRelativeToParent(grandparent);
 
@@ -289,6 +290,8 @@ public class DecisionDiagram {
                     } else if (pSide == DecisionNode.Side.RIGHT) {
                         grandparent.setRightChild(parentNode.getLeftChild());
                     }
+
+                    parentNode.getLeftChild().removeParent(parentNode);
 
 
                 } else {
@@ -302,8 +305,24 @@ public class DecisionDiagram {
                 return parentNode;
             }
 
-        // return parentNode.getParent() ;
-            return reductionI(grandparent);
+        }
+
+        DecisionNode[]  parents2 = parentNode.getParents().getAllItems(DecisionNode.class);
+
+        if (parents2 == null) {
+            return parentNode;
+        }
+
+        for (DecisionNode parent :
+                parents2) {
+
+
+
+            return reductionI(parent);
+
+        }
+
+        return null;
 
     }
 
