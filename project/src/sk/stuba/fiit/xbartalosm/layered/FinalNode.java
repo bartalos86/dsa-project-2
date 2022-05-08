@@ -50,6 +50,5 @@ public class FinalNode extends DecisionNode{
     @Override
     public void setRightChild(DecisionNode rightChild) {
         System.out.println("You cant do that");
-
     }
 }

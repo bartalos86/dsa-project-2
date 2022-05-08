@@ -9,19 +9,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        String binaryExpression = "ABC+AC+ac";
-        binaryExpression = "ABD+ACd+ABCDd+ABC+abc+ABD";
-        //binaryExpression = "ABCD+BCD+D+B";
-        binaryExpression = "ABCdD";
-       // binaryExpression = "ABC+abc";
-        //binaryExpression = "AB+C";
-        //binaryExpression = "aBcDeFGhIJkL+ABCDeFghIJkL+deFGhIJkL+BcDEFgh+AbCdefGHijkl+JkL";
-        //binaryExpression = "fG+aBCdefG+ABCD";
-       // binaryExpression = "DE+bcDE+AbCDe";
-        //ABcDEfGH+abCDEfghIJKL+Jk+ABcdeFghIJk+BC+abcDEfghIJKL
-        //binaryExpression = "AB+cA+bD";
-        binaryExpression="abcDe+Acd+abc+AbC+acDe+AC+acde+aBD+aE+be";
-        String order = "ABCDE";
 
         System.out.println("---------Testing performance---------");
         for (int i = 1; i < 26; i++) {
@@ -36,7 +23,15 @@ public class Main {
             testCorrectness(i);
         }
 
-       /* while(!testCorrectness(15)){
+        //Test for testing lots of different cases
+       /* System.out.println("---------Testing performance bulk---------");
+        for (int i = 1; i < 10000; i++) {
+            System.out.println("Case #" + i);
+            testPerformance(25);
+        }
+        System.out.println("######################################");*/
+
+        /*while(!testCorrectness(15)){
 
         }*/
 
@@ -51,7 +46,7 @@ public class Main {
         final String abc =  "ABCDEFGHIJKLMONPQRSTUVWXYZ";
         String testingOrder = abc.substring(0,n);
         Random rand = new Random();
-        int parts = rand.nextInt(15)+4;
+        int parts = rand.nextInt(20)+5;
 
         System.out.printf("Testing for %d characters, %d parts and %d min. part length \n", n,parts,Math.min(2,n));
 
@@ -123,8 +118,7 @@ public class Main {
         System.out.println("Character order: " + order);
 
         DecisionDiagram testDiagram = DecisionDiagram.createBDD(expression,order);
-        //testDiagram.printStatistics();
-       // testDiagram.printTreeNorm();
+        testDiagram.printStatistics();
 
         ClosedHashTable<TesterInput> testInput = new Tester().generateTestingVector(expression,order);
         TesterInput[] inputs = testInput.getAllItems(TesterInput.class);

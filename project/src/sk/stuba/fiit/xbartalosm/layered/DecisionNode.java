@@ -138,8 +138,6 @@ public class DecisionNode implements Comparable<DecisionNode> {
             for (int i = 0; i < parts.length; i++) {
                 if(partsMap.search(parts[i]) == null) //Only one
                 partsMap.insert(parts[i]);
-                else if(parts[i].contains("0"))
-                    System.out.println(parts[i]);
             }
 
             String[] allParts = partsMap.getAllItems(String.class);

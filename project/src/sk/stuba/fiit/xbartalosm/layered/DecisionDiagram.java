@@ -183,15 +183,10 @@ public class DecisionDiagram {
 
                     DecisionNode existingNode = leftNodeExists;//levels[i+1].search(leftNode);
 
-                    if (existingNode == null)
-                        System.out.printf("Null");
 
                     if (!leftNode.getExpression().isEmpty())
                         parentNode.setLeftChild(existingNode);
                 }
-
-                if (parentNode.getLeftChild() == null || parentNode.getRightChild() == null)
-                    System.out.println();
 
                 if (isLastLayer) {
 
@@ -241,8 +236,6 @@ public class DecisionDiagram {
 
                 if (grandparent != null) {
                     DecisionNode.Side pSide = parentNode.sideRelativeToParent(grandparent);
-                    if (pSide == DecisionNode.Side.BOTH)
-                        System.out.println("both");
 
                     if (pSide == DecisionNode.Side.LEFT || pSide == DecisionNode.Side.BOTH) {
                         grandparent.setLeftChild(parentNode.getLeftChild());
@@ -355,41 +348,6 @@ public class DecisionDiagram {
         System.out.println("Total nodes: " + totalNodes);
         System.out.println("Reduction rate: " + reductionRate);
     }
-
-
-   /* void inorderTraversalHelper(DecisionNode node) {
-        if (node != null) {
-            inorderTraversalHelper(node.getLeftChild());
-            System.out.printf("%s ", node.getExpression());
-            inorderTraversalHelper(node.getRightChild());
-        }
-    }*/
-
-    //function to print inorder traversal
-   /* public void inorderTraversal() {
-        inorderTraversalHelper(this.root);
-    }*/
-
-    // helper function to print the tree.
-   /* void printTreeHelper(DecisionNode root, int space) {
-        int i;
-        if (root != null) {
-            space = space + 10;
-            printTreeHelper(root.getRightChild(), space);
-            System.out.printf("\n");
-            for (i = 10; i < space; i++) {
-                System.out.printf(" ");
-            }
-            System.out.printf("%s", root.getExpression());
-            System.out.printf("\n");
-            printTreeHelper(root.getLeftChild(), space);
-        }
-    }*/
-
-    // function to print the tree.
-   /* public void printTree() {
-        printTreeHelper(this.root, 0);
-    }*/
 
 
     public DecisionNode getRoot() {
